@@ -73,7 +73,6 @@ server.post("/sign-in", async (req, res) => {
 server.delete("/logout", async (req, res) => {
   const { authorization } = req.headers;
   const token = authorization?.replace("Bearer ", "");
-  console.log(token);
   if (!token) return res.sendStatus(401);
   try {
     const session = await db.collection("sessions").findOne({ token: token });
@@ -84,6 +83,22 @@ server.delete("/logout", async (req, res) => {
     return res.status(500).send("Erro inesperado. Tente novamente.")
   }
 });
+
+server.get("/transactions", async(req, res)=>{
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+  if (!token) return res.sendStatus(401);
+  try {
+    const session = await db.collection("sessions").findOne({ token: token });
+    if (!session) return res.sendStatus(401);
+    const user = await db.collection("users").findOne({_id: session.userId});
+    if (!user) return res.status(404).send("Usuário não encontrado");
+    const transactions = await db.collection("transactions").find({userId: user._id}).toArray();
+    return res.status(200).send({nome:user.nome, transactions});
+  } catch (err) {
+    return res.status(500).send("Erro inesperado. Tente novamente.");
+  }
+})
 
 const PORT = 5001;
 server.listen(PORT, console.log(`Server running on port ${PORT}`));
