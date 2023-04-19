@@ -60,7 +60,6 @@ server.post("/sign-in", async (req, res) => {
   try {
     const user = await db.collection("users").findOne({ email: email });
     if (!user) return res.status(404).send("Email não cadastrado");
-    console.log(user);
     if (!bcrypt.compareSync(senha, user.senha))
       return res.status(401).send("Senha não confere");
     const token = uuid();
@@ -68,6 +67,21 @@ server.post("/sign-in", async (req, res) => {
     return res.status(200).send(token);
   } catch (err) {
     return res.status(500).send("Erro inesperado. Tente novamente.");
+  }
+});
+
+server.delete("/logout", async (req, res) => {
+  const { authorization } = req.headers;
+  const token = authorization?.replace("Bearer ", "");
+  console.log(token);
+  if (!token) return res.sendStatus(401);
+  try {
+    const session = await db.collection("sessions").findOne({ token: token });
+    if (!session) return res.sendStatus(401);
+    await db.collection("sessions").deleteOne(session);
+    return res.sendStatus(202);
+  } catch (err) {
+    return res.status(500).send("Erro inesperado. Tente novamente.")
   }
 });
 
