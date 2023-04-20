@@ -10,7 +10,7 @@ server.use(cors());
 server.use(express.json());
 
 dotenv.config();
-const mongoClient = new MongoClient(process.env.DATABASE_URL);
+const mongoClient = new MongoClient(process.env.MONGO_URI);
 try {
   await mongoClient.connect();
 } catch (err) {
@@ -28,5 +28,4 @@ server.get("/transactions", getTransactions);
 
 server.post("/new-transaction", newTransaction);
 
-const PORT = 5000;
-server.listen(PORT, console.log(`Server running on port ${PORT}`));
+server.listen(process.env.PORT, console.log(`Server running on port ${process.env.PORT}`));
