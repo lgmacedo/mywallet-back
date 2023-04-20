@@ -1,4 +1,4 @@
-import { db } from "../app.js";
+import db from "../database/database.connect.js";
 import Joi from "joi";
 import dayjs from "dayjs";
 
