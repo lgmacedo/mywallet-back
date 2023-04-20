@@ -2,10 +2,6 @@ import { MongoClient } from "mongodb";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import Joi from "joi";
-import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
-import dayjs from "dayjs";
 import { LogOut, SignIn, SignUp } from "./controllers/usersController.js";
 import { getTransactions, newTransaction } from "./controllers/transactionsController.js";
 
