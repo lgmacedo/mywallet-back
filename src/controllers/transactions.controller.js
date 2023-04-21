@@ -1,11 +1,9 @@
 import db from "../database/database.connect.js";
-import Joi from "joi";
 import dayjs from "dayjs";
 
 export async function getTransactions(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  if (!token) return res.sendStatus(401);
+  const {token} = res.locals;
+  
   try {
     const session = await db.collection("sessions").findOne({ token: token });
     if (!session) return res.sendStatus(401);
@@ -22,21 +20,8 @@ export async function getTransactions(req, res) {
 }
 
 export async function newTransaction(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  if (!token) return res.sendStatus(401);
+  const {token} = res.locals;
   const { valor, descricao, tipo } = req.body;
-  const transactionSchema = Joi.object({
-    valor: Joi.number().positive().required(),
-    descricao: Joi.string().required(),
-    tipo: Joi.string().valid("entrada", "saida").required(),
-  });
-  const validation = transactionSchema.validate(req.body, {
-    abortEarly: false,
-  });
-  if (validation.error) {
-    return res.status(422).send(validation.error.details.map((d) => d.message));
-  }
 
   try {
     const session = await db.collection("sessions").findOne({ token: token });

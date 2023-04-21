@@ -1,19 +1,10 @@
 import db from "../database/database.connect.js";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import Joi from "joi";
 
 export async function SignUp(req, res) {
   const { nome, email, senha } = req.body;
-  const userSchema = Joi.object({
-    nome: Joi.string().required(),
-    email: Joi.string().email().required(),
-    senha: Joi.string().min(3).required(),
-  });
-  const validation = userSchema.validate(req.body, { abortEarly: false });
-  if (validation.error) {
-    return res.status(422).send(validation.error.details.map((d) => d.message));
-  }
+
   const passwordHash = bcrypt.hashSync(senha, 10);
   try {
     const usuario = await db
@@ -33,14 +24,7 @@ export async function SignUp(req, res) {
 
 export async function SignIn(req, res) {
   const { email, senha } = req.body;
-  const userSchema = Joi.object({
-    email: Joi.string().email().required(),
-    senha: Joi.string().min(3).required(),
-  });
-  const validation = userSchema.validate(req.body, { abortEarly: false });
-  if (validation.error) {
-    return res.status(422).send(validation.error.details.map((d) => d.message));
-  }
+
   try {
     const user = await db.collection("users").findOne({ email: email });
     if (!user) return res.status(404).send("Email não cadastrado");
@@ -55,9 +39,8 @@ export async function SignIn(req, res) {
 }
 
 export async function LogOut(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
-  if (!token) return res.sendStatus(401);
+  const {token} = res.locals;
+  
   try {
     const session = await db.collection("sessions").findOne({ token: token });
     if (!session) return res.sendStatus(401);
