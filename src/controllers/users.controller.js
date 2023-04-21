@@ -39,8 +39,8 @@ export async function SignIn(req, res) {
 }
 
 export async function LogOut(req, res) {
-  const {token} = res.locals;
-  
+  const { token } = res.locals;
+
   try {
     const session = await db.collection("sessions").findOne({ token: token });
     if (!session) return res.sendStatus(401);
