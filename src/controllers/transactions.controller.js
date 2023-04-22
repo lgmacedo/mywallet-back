@@ -81,3 +81,22 @@ export async function updateTransaction(req, res) {
     return res.status(500).send("Erro inesperado. Tente novamente.");
   }
 }
+
+export async function deleteTransaction(req, res){
+  const { token } = res.locals;
+
+  const { id } = req.params;
+
+  try {
+    const session = await db.collection("sessions").findOne({ token: token });
+    if (!session) return res.sendStatus(401);
+    const transaction = await db
+      .collection("transactions")
+      .findOne({ _id: new ObjectId(id) });
+    if (!transaction) return res.status(404).send("Transação não encontrada");
+    await db.collection("transactions").deleteOne(transaction);
+    return res.sendStatus(202);
+  } catch (err) {
+    return res.status(500).send("Erro inesperado. Tente novamente.");
+  }
+}

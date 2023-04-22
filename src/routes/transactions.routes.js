@@ -4,6 +4,7 @@ import {
   newTransaction,
   getTransaction,
   updateTransaction,
+  deleteTransaction
 } from "../controllers/transactions.controller.js";
 import checkToken from "../middlewares/checkToken.middleware.js";
 
@@ -23,5 +24,6 @@ transactionRoutes.put(
   validateSchema(transactionSchema),
   updateTransaction
 );
+transactionRoutes.delete("/delete-transaction/:id", deleteTransaction)
 
 export default transactionRoutes;
